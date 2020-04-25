@@ -4,6 +4,8 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 changes_made=false
 
+git checkout master
+
 if [ -f "youtube-to-mp3_i386.deb" ]; then
 	rm "youtube-to-mp3_i386.deb"
 fi
@@ -57,9 +59,10 @@ if [ $changes_made = true ]; then
 	git add .SRCINFO
 
 	# Update repository
-	git commit -m "Updated md5sums and .SRCINFO. Waiting 10 seconds before pushing.."
+	git commit -m "Updated md5sums and .SRCINFO"
+	echo "Updated md5sums and .SRCINFO. Waiting 10 seconds before pushing.."
 	sleep 10
-	git push
+	git push origin aur
 fi
 
 ## Cleanup
