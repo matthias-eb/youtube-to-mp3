@@ -28,11 +28,7 @@ if [ $? -eq 0 ]; then
 	echo "File 'youtube-to-mp3_i386.deb' OK."
 else
 	echo -e "${RED}File 'youtube-to-mp3_i386.deb' changed! Updating md5sum..${NC}"
-	if [ -f md5sum_i386 ]; then
-		rm md5sum_i386
-	fi
-	md5sum "youtube-to-mp3_i386.deb" > md5sum_i386
-	md5_i386=$(cat md5sum_i386 | cut -d ' ' -f 1)	# Take the md5um String, cut it at the space, take the first part and save it to md5_x68_64.
+	md5_i386=$(md5sum "youtube-to-mp3_i386.deb" | cut -d ' ' -f 1)
 	sed -i "s/md5sums_i386=(.\+/md5sums_i386=(\"${md5_i386}\")/" PKGBUILD # Replace the first line in PKGBUILD starting with md5sums_i386=( with the same string and the added new md5sum
 	git add PKGBUILD
 	changes_made=true
@@ -42,11 +38,7 @@ if [ $? -eq 0 ]; then
 	echo "File 'youtube-to-mp3_x86_64.deb' OK."
 else
 	echo -e "${RED}File 'youtube-to-mp3_x86_64.deb' changed! Updating md5sum..${NC}"
-	if [ -f md5sum_x86_64 ]; then
-		rm md5sum_x86_64
-	fi
-	md5sum "youtube-to-mp3_x86_64.deb" > md5sum_x86_64
-	md5_x86_64=$(cat md5sum_x86_64 | cut -d ' ' -f 1)	# Take the md5um String, cut it at the space, take the first part and save it to md5_x68_64.
+	md5_x86_64=$(md5sum "youtube-to-mp3_x86_64.deb" | cut -d ' ' -f 1)
 	sed -i "s/md5sums_x86_64=(.\+/md5sums_x86_64=(\"$md5_x86_64\")/" PKGBUILD # Replace the first line starting with md5sums_x86_64=( with the same string and the added new md5sum
 	git add PKGBUILD
 	changes_made=true
@@ -62,7 +54,19 @@ if [ $changes_made = true ]; then
 	git commit -m "Updated md5sums and .SRCINFO"
 	echo "Updated md5sums and .SRCINFO. Waiting 10 seconds before pushing.."
 	sleep 10
-	git push origin aur
+	git push origin master
+	echo "Do you want to publish the updated PKGBUILD and .SRCINFO to the AUR?"
+	read answer
+	if [ $answer == "yes" ]; then
+		git push origin aur
+	fi
+	echo "Pushing the updated checksums to the home repository"
+	git checkout update_script
+	md5sum "youtube-to-mp3_x86_64.deb" > md5sum_x86_64
+	md5sum "youtube-to-mp3_i386.deb" > md5sum_i386
+	git add md5sum_x86_64 md5sum_i386
+	git commit -m "Changed md5sums."
+	git push origin master
 fi
 
 ## Cleanup
