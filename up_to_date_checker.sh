@@ -16,6 +16,7 @@ fi
 wget -O "youtube-to-mp3_i386.deb" "https://www.mediahuman.com/de/download/YouTubeToMP3.i386.deb" # Download 32 Bit File
 wget -O "youtube-to-mp3_x86_64.deb" "https://www.mediahuman.com/de/download/YouTubeToMP3.amd64.deb" # Download 64 Bit File
 
+# If the script is run for the first time, just create the files and upload them
 if [ ! -f md5sum_i386 ]; then
 	echo "md5sum Datei i386 neu erstellt."
 	md5sum "youtube-to-mp3_i386.deb" > md5sum_i386
@@ -26,7 +27,14 @@ if [ ! -f md5sum_x86_64 ]; then
 	md5sum "youtube-to-mp3_x86_64.deb" > md5sum_x86_64
 	changes_made=true
 fi
+if [ $changes_made == "true" ]; then
+	git add md5sum_x86_64 md5sum_i386
+	git commit -m "Changed md5sums."
+	git push
+	changes_made=false
+fi
 
+# Check for changes in the md5sum
 md5sum -c md5sum_i386 --status
 if [ $? -eq 0 ]; then
 	echo "File 'youtube-to-mp3_i386.deb' OK."
@@ -50,15 +58,16 @@ fi
 
 git checkout master
 
-if [ $changes_made = true ]; then
+if [ $changes_made == "true" ]; then
 	# Update .SRCINFO
 	makepkg -cf
 	makepkg --printsrcinfo > .SRCINFO
-	git add .SRCINFO
+	git add PKGBUILD .SRCINFO
 
 	# Update repository
-	git commit -m "Updated md5sums and .SRCINFO"
-	echo "Updated md5sums and .SRCINFO. Waiting 10 seconds before pushing.."
+	git commit -m "PKGBUILD md5sums and .SRCINFO"
+	echo "Updated PKGBUILD md5sums and .SRCINFO. Waiting 10 seconds before pushing. To cancel, press Ctrl+C"
+	git status
 	sleep 10
 	git push origin master
 	echo "Do you want to publish the updated PKGBUILD and .SRCINFO to the AUR?"
@@ -72,7 +81,7 @@ if [ $changes_made = true ]; then
 	md5sum "youtube-to-mp3_i386.deb" > md5sum_i386
 	git add md5sum_x86_64 md5sum_i386
 	git commit -m "Changed md5sums."
-	git push origin master
+	git push
 fi
 
 ## Cleanup
