@@ -4,7 +4,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 changes_made=false
 
-git checkout master
+
 
 if [ -f "youtube-to-mp3_i386.deb" ]; then
 	rm "youtube-to-mp3_i386.deb"
@@ -17,10 +17,14 @@ wget -O "youtube-to-mp3_i386.deb" "https://www.mediahuman.com/de/download/YouTub
 wget -O "youtube-to-mp3_x86_64.deb" "https://www.mediahuman.com/de/download/YouTubeToMP3.amd64.deb" # Download 64 Bit File
 
 if [ ! -f md5sum_i386 ]; then
+	echo "md5sum Datei i386 neu erstellt."
 	md5sum "youtube-to-mp3_i386.deb" > md5sum_i386
+	changes_made=true
 fi
 if [ ! -f md5sum_x86_64 ]; then
+	echo "md5sum Datei x86_64 neu erstellt."
 	md5sum "youtube-to-mp3_x86_64.deb" > md5sum_x86_64
+	changes_made=true
 fi
 
 md5sum -c md5sum_i386 --status
@@ -43,6 +47,8 @@ else
 	git add PKGBUILD
 	changes_made=true
 fi
+
+git checkout master
 
 if [ $changes_made = true ]; then
 	# Update .SRCINFO
