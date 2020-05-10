@@ -61,6 +61,10 @@ git checkout master
 if [ $changes_made == "true" ]; then
 	# Update .SRCINFO
 	makepkg -cf
+	if [ $? -ne 0 ]; then
+		echo "Building the package failed. Please check above. Terminating..."
+		exit -2
+	fi
 	makepkg --printsrcinfo > .SRCINFO
 	git add PKGBUILD .SRCINFO
 
