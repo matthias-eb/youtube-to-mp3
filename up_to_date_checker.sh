@@ -28,7 +28,7 @@ if [ ! -f md5sum_x86_64 ]; then
 	changes_made=true
 fi
 if [ $changes_made == "true" ]; then
-	echo "Updating checksums and terminating.."
+	echo "Adding checksums for the first time"
 	git add md5sum_x86_64 md5sum_i386
 	git commit -m "Changed md5sums."
 	git push
@@ -42,22 +42,25 @@ if [ $? -eq 0 ]; then
 else
 	echo -e "${RED}File 'youtube-to-mp3_i386.deb' changed! Updating md5sum..${NC}"
 	md5_i386=$(md5sum "youtube-to-mp3_i386.deb" | cut -d ' ' -f 1)
+	git checkout master
 	sed -i "s/md5sums_i386=(.\+/md5sums_i386=(\"${md5_i386}\")/" PKGBUILD # Replace the first line in PKGBUILD starting with md5sums_i386=( with the same string and the added new md5sum
 	git add PKGBUILD
+	git commit -m "32 Bit md5sum changed for PKGBUILD"
 	changes_made=true
 fi
+git checkout update_script
 md5sum -c md5sum_x86_64 --status
 if [ $? -eq 0 ]; then
 	echo "File 'youtube-to-mp3_x86_64.deb' OK."
 else
 	echo -e "${RED}File 'youtube-to-mp3_x86_64.deb' changed! Updating md5sum..${NC}"
 	md5_x86_64=$(md5sum "youtube-to-mp3_x86_64.deb" | cut -d ' ' -f 1)
+	git checkout master
 	sed -i "s/md5sums_x86_64=(.\+/md5sums_x86_64=(\"$md5_x86_64\")/" PKGBUILD # Replace the first line starting with md5sums_x86_64=( with the same string and the added new md5sum
 	git add PKGBUILD
+	git commit -m "64 Bit md5sum changed for PKGBUILD"
 	changes_made=true
 fi
-
-git checkout master
 
 if [ $changes_made == "true" ]; then
 	# Update .SRCINFO
@@ -67,10 +70,10 @@ if [ $changes_made == "true" ]; then
 		exit -2
 	fi
 	makepkg --printsrcinfo > .SRCINFO
-	git add PKGBUILD .SRCINFO
+	git add .SRCINFO
+	git commit -m ".SRCINFO regenerated"
 
 	# Update repository
-	git commit -m "PKGBUILD md5sums and .SRCINFO"
 	echo "Updated PKGBUILD md5sums and .SRCINFO. Waiting 10 seconds before pushing. To cancel, press Ctrl+C"
 	git status
 	sleep 10
