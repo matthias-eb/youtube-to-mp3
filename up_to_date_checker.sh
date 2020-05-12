@@ -28,6 +28,7 @@ if [ ! -f md5sum_x86_64 ]; then
 	changes_made=true
 fi
 if [ $changes_made == "true" ]; then
+	echo "Updating checksums and terminating.."
 	git add md5sum_x86_64 md5sum_i386
 	git commit -m "Changed md5sums."
 	git push
