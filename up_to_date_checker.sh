@@ -47,8 +47,8 @@ else
 	git add PKGBUILD
 	git commit -m "32 Bit md5sum changed for PKGBUILD"
 	changes_made=true
+	git checkout update_script
 fi
-git checkout update_script
 md5sum -c md5sum_x86_64 --status
 if [ $? -eq 0 ]; then
 	echo "File 'youtube-to-mp3_x86_64.deb' OK."
