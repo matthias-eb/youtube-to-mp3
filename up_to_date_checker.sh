@@ -70,19 +70,25 @@ if [ $changes_made == "true" ]; then
 		exit -2
 	fi
 	makepkg --printsrcinfo > .SRCINFO
-	git add .SRCINFO
-	git commit -m ".SRCINFO regenerated"
+	git add PKGBUILD .SRCINFO
+	git commit -m ".SRCINFO regenerated, Possibly updated Version number"
 
 	# Update repository
-	echo "Updated PKGBUILD md5sums and .SRCINFO. Waiting 10 seconds before pushing. To cancel, press Ctrl+C"
 	git status
-	sleep 10
-	git push origin master
 	echo "Do you want to publish the updated PKGBUILD and .SRCINFO to the AUR?"
 	read answer
 	if [ $answer == "yes" ]; then
 		git push aur
+		if [ $? -ne 0 ]; then
+			echo "Pushing failed. Do you want to push through refspec Nmbr?"
+			read answer
+			if [ $answer == "yes" ]; then
+
+			fi
+		fi
 	fi
+	echo "Pushing PKGBUILD and .SRCINFO to home repository.."
+	git push origin master
 	echo "Pushing the updated checksums to the home repository"
 	git checkout update_script
 	md5sum "youtube-to-mp3_x86_64.deb" > md5sum_x86_64
