@@ -81,7 +81,7 @@ if [ $changes_made == "true" ]; then
 	echo "Do you want to publish the updated PKGBUILD and .SRCINFO to the AUR?"
 	read answer
 	if [ $answer == "yes" ]; then
-		git push origin aur
+		git push aur
 	fi
 	echo "Pushing the updated checksums to the home repository"
 	git checkout update_script
