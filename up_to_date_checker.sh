@@ -64,29 +64,45 @@ fi
 
 if [ $changes_made == "true" ]; then
 	# Update .SRCINFO
+	pkgverline="$(cat PKGBUILD | grep pkgver= | head -1)"
 	makepkg -cf
 	if [ $? -ne 0 ]; then
 		echo "Building the package failed. Please check above. Terminating..."
 		exit -2
 	fi
+	if [ $pkgverline == $(cat PKGBUILD | grep pkgver= | head -1) ]; then
+		pkgrelline=$(cat PKGBUILD | grep 'pkgrel')
+		pkgrel=${pkgrelline#*=}
+		let "pkgrel++"
+		pkgrelline="${pkgrelline%=*}=$pkgrel"
+		echo "${RED}$pkgrelline${NC}"
+		sed -i "s/pkgrel=.\+/$pkgrelline/" PKGBUILD
+
+		# Rebuild Package
+		makepkg -cf
+		if [ $? -ne 0 ]; then
+			echo "Building the package failed. Please check above. Terminating..."
+			exit -2
+		fi
+	fi
 	makepkg --printsrcinfo > .SRCINFO
 	git add PKGBUILD .SRCINFO
-	git commit -m ".SRCINFO regenerated, Possibly updated Version number"
+	git commit -m ".SRCINFO regenerated, updated Package Version to ${pkgverline#*=} and Package Release Nr. to $pkgrel"
 
 	# Update repository
 	git status
 	echo "Do you want to publish the updated PKGBUILD and .SRCINFO to the AUR?"
-	read answer
-	if [ $answer == "yes" ]; then
-		git push aur
-		if [ $? -ne 0 ]; then
-			echo "Pushing failed. Do you want to push through refspec Nmbr?"
-			read answer
-			if [ $answer == "yes" ]; then
-
+	answer=""
+	while [ ${answer} != "n" ] && [ ${answer} != "y" ] && [ ${answer} != "yes" ] && [ ${answer} != "no" ]; do
+		read answer
+		answer="${answer,,}"
+		if [ "$answer" = "yes" ] || [ "$answer" = "y" ]; then
+			git push aur
+			if [ $? -ne 0 ]; then
+				echo "Pushing failed. Please check for errors."
 			fi
 		fi
-	fi
+	done
 	echo "Pushing PKGBUILD and .SRCINFO to home repository.."
 	git push origin master
 	echo "Pushing the updated checksums to the home repository"
