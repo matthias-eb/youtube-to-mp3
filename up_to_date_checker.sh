@@ -101,6 +101,10 @@ if [ $changes_made == "true" ]; then
 			if [ $? -ne 0 ]; then
 				echo "Pushing failed. Please check for errors."
 			fi
+		elif [ "$answer" = "no" ] || [ "$answer" = "n" ]; then
+			echo "Skipping AUR push.."
+		else
+			echo "Please Write one of the following and press enter: yes/no/y/n"
 		fi
 	done
 	echo "Pushing PKGBUILD and .SRCINFO to home repository.."
