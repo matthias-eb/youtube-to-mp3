@@ -65,15 +65,27 @@ fi
 if [ $changes_made == "true" ]; then
 	# Update .SRCINFO
 	pkgverline="$(cat PKGBUILD | grep pkgver= | head -1)"
+	pkgrelline=$(cat PKGBUILD | grep 'pkgrel')
+	pkgrel=${pkgrelline#*=}
 	makepkg -cf
 	if [ $? -ne 0 ]; then
 		echo "Building the package failed. Please check above. Terminating..."
 		exit -2
 	fi
 	if [ $pkgverline == $(cat PKGBUILD | grep pkgver= | head -1) ]; then
-		pkgrelline=$(cat PKGBUILD | grep 'pkgrel')
-		pkgrel=${pkgrelline#*=}
 		let "pkgrel++"
+		pkgrelline="${pkgrelline%=*}=$pkgrel"
+		echo "${RED}$pkgrelline${NC}"
+		sed -i "s/pkgrel=.\+/$pkgrelline/" PKGBUILD
+
+		# Rebuild Package
+		makepkg -cf
+		if [ $? -ne 0 ]; then
+			echo "Building the package failed. Please check above. Terminating..."
+			exit -2
+		fi
+	elif (( pkgrel >= 2 )); then
+		pkgrel = 1
 		pkgrelline="${pkgrelline%=*}=$pkgrel"
 		echo "${RED}$pkgrelline${NC}"
 		sed -i "s/pkgrel=.\+/$pkgrelline/" PKGBUILD
