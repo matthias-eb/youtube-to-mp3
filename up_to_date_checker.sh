@@ -93,7 +93,7 @@ if [ $changes_made == "true" ]; then
 	git status
 	echo "Do you want to publish the updated PKGBUILD and .SRCINFO to the AUR?"
 	answer=""
-	while [ ${answer} != "n" ] && [ ${answer} != "y" ] && [ ${answer} != "yes" ] && [ ${answer} != "no" ]; do
+	while [ "$answer" != "n" ] && [ "$answer" != "y" ] && [ "$answer" != "yes" ] && [ "$answer" != "no" ]; do
 		read answer
 		answer="${answer,,}"
 		if [ "$answer" = "yes" ] || [ "$answer" = "y" ]; then
