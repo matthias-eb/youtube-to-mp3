@@ -121,6 +121,4 @@ fi
 ## Cleanup
 rm "youtube-to-mp3_i386.deb"
 rm "youtube-to-mp3_x86_64.deb"
-if [ -f "*.pkg.tar.xz" ]; then
-	rm "*.pkg.tar.xz"
-fi
+rm "*.pkg.tar.xz"
