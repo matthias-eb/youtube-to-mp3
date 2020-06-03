@@ -74,7 +74,7 @@ if [ $changes_made == "true" ]; then
 	if [ $? -ne 0 ]; then
 		echo "Building the package failed. Please check above. Terminating..."
 		## Revert committed changes
-		last_commit=$(git log -1 --format=oneline)
+		last_commit=$(git log -1 --format=format:%s)
 		cnt=0
 		while [ \( "$last_commit" = "$MSG_32_SUM_CHANGED" -o "$last_commit" = "$MSG_64_SUM_CHANGED" \) -a $cnt -lt 2 ]; do
 			echo "Removing following commit:" 
