@@ -133,4 +133,4 @@ fi
 ## Cleanup
 rm "youtube-to-mp3_i386.deb"
 rm "youtube-to-mp3_x86_64.deb"
-rm "*.pkg.tar.xz"
+rm "*.pkg.tar.xz" > /dev/null 2>&1	# Redirect error messages as well as output to /dev/null
