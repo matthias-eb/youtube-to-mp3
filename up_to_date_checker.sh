@@ -1,5 +1,8 @@
 #!/bin/bash
 
+MSG_32_SUM_CHANGED="32 Bit md5sum changed for PKGBUILD"
+MSG_64_SUM_CHANGED="64 Bit md5sum changed for PKGBUILD"
+
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 changes_made=false
@@ -45,7 +48,7 @@ else
 	git checkout master
 	sed -i "s/md5sums_i386=(.\+/md5sums_i386=(\"${md5_i386}\")/" PKGBUILD # Replace the first line in PKGBUILD starting with md5sums_i386=( with the same string and the added new md5sum
 	git add PKGBUILD
-	git commit -m "32 Bit md5sum changed for PKGBUILD"
+	git commit -m "$MSG_32_SUM_CHANGED"
 	changes_made=true
 	git checkout update_script
 fi
@@ -58,7 +61,7 @@ else
 	git checkout master
 	sed -i "s/md5sums_x86_64=(.\+/md5sums_x86_64=(\"$md5_x86_64\")/" PKGBUILD # Replace the first line starting with md5sums_x86_64=( with the same string and the added new md5sum
 	git add PKGBUILD
-	git commit -m "64 Bit md5sum changed for PKGBUILD"
+	git commit -m "$MSG_64_SUM_CHANGED"
 	changes_made=true
 fi
 
@@ -70,6 +73,15 @@ if [ $changes_made == "true" ]; then
 	makepkg -cf
 	if [ $? -ne 0 ]; then
 		echo "Building the package failed. Please check above. Terminating..."
+		## Revert committed changes
+		last_commit=$(git log -1 --format=oneline)
+		cnt=0
+		while [ \( "$last_commit" = "$MSG_32_SUM_CHANGED" -o "$last_commit" = "$MSG_64_SUM_CHANGED" \) -a $cnt -lt 2 ]; do
+			echo "Removing following commit:" 
+			git log -1
+			git reset --hard HEAD~1
+			let "cnt++"
+		done
 		exit -2
 	fi
 	if [ $pkgverline == $(cat PKGBUILD | grep pkgver= | head -1) ]; then
