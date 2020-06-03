@@ -7,6 +7,18 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 changes_made=false
 
+function revertCommits() {
+	## Revert committed changes
+	last_commit=$(git log -1 --format=format:%s)
+	cnt=0
+	while [ \( "$last_commit" = "$MSG_32_SUM_CHANGED" -o "$last_commit" = "$MSG_64_SUM_CHANGED" \) -a $cnt -lt 2 ]; do
+		echo "Removing following commit:" 
+		git log -1
+		git reset --hard HEAD~1
+		let "cnt++"
+	done
+}
+
 
 
 if [ -f "youtube-to-mp3_i386.deb" ]; then
@@ -73,39 +85,31 @@ if [ $changes_made == "true" ]; then
 	makepkg -cf
 	if [ $? -ne 0 ]; then
 		echo "Building the package failed. Please check above. Terminating..."
-		## Revert committed changes
-		last_commit=$(git log -1 --format=format:%s)
-		cnt=0
-		while [ \( "$last_commit" = "$MSG_32_SUM_CHANGED" -o "$last_commit" = "$MSG_64_SUM_CHANGED" \) -a $cnt -lt 2 ]; do
-			echo "Removing following commit:" 
-			git log -1
-			git reset --hard HEAD~1
-			let "cnt++"
-		done
+		revertCommits()
 		exit -2
 	fi
 	if [ $pkgverline == $(cat PKGBUILD | grep pkgver= | head -1) ]; then
 		let "pkgrel++"
 		pkgrelline="${pkgrelline%=*}=$pkgrel"
-		echo "${RED}$pkgrelline${NC}"
 		sed -i "s/pkgrel=.\+/$pkgrelline/" PKGBUILD
 
 		# Rebuild Package
 		makepkg -cf
 		if [ $? -ne 0 ]; then
 			echo "Building the package failed. Please check above. Terminating..."
+			revertCommits()
 			exit -2
 		fi
 	elif (( pkgrel >= 2 )); then
 		pkgrel = 1
 		pkgrelline="${pkgrelline%=*}=$pkgrel"
-		echo "${RED}$pkgrelline${NC}"
 		sed -i "s/pkgrel=.\+/$pkgrelline/" PKGBUILD
 
 		# Rebuild Package
 		makepkg -cf
 		if [ $? -ne 0 ]; then
 			echo "Building the package failed. Please check above. Terminating..."
+			revertCommits()
 			exit -2
 		fi
 	fi
