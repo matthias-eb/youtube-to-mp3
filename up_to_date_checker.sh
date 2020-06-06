@@ -85,7 +85,7 @@ if [ $changes_made == "true" ]; then
 	makepkg -cf
 	if [ $? -ne 0 ]; then
 		echo "Building the package failed. Please check above. Terminating..."
-		revertCommits()
+		revertCommits
 		exit -2
 	fi
 	if [ $pkgverline == $(cat PKGBUILD | grep pkgver= | head -1) ]; then
@@ -97,7 +97,7 @@ if [ $changes_made == "true" ]; then
 		makepkg -cf
 		if [ $? -ne 0 ]; then
 			echo "Building the package failed. Please check above. Terminating..."
-			revertCommits()
+			revertCommits
 			exit -2
 		fi
 	elif (( pkgrel >= 2 )); then
@@ -109,7 +109,7 @@ if [ $changes_made == "true" ]; then
 		makepkg -cf
 		if [ $? -ne 0 ]; then
 			echo "Building the package failed. Please check above. Terminating..."
-			revertCommits()
+			revertCommits
 			exit -2
 		fi
 	fi
