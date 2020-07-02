@@ -19,6 +19,13 @@ function revertCommits() {
 	done
 }
 
+function removeFiles() {
+	## Try to delete those Files while ignoring the output
+	rm "youtube-to-mp3_i386.deb" > /dev/null 2>&1
+	rm "youtube-to-mp3_x86_64.deb" > /dev/null 2>&1
+	rm "*.pkg.tar.xz" > /dev/null 2>&1
+}
+
 
 
 if [ -f "youtube-to-mp3_i386.deb" ]; then
@@ -86,6 +93,7 @@ if [ $changes_made == "true" ]; then
 	if [ $? -ne 0 ]; then
 		echo "Building the package failed. Please check above. Terminating..."
 		revertCommits
+		removeFiles
 		exit -2
 	fi
 	if [ $pkgverline == $(cat PKGBUILD | grep pkgver= | head -1) ]; then
@@ -146,7 +154,4 @@ if [ $changes_made == "true" ]; then
 	git push
 fi
 
-## Cleanup
-rm "youtube-to-mp3_i386.deb"
-rm "youtube-to-mp3_x86_64.deb"
-rm "*.pkg.tar.xz" > /dev/null 2>&1	# Redirect error messages as well as output to /dev/null
+removeFiles
