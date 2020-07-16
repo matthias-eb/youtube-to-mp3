@@ -110,7 +110,7 @@ if [ $changes_made == "true" ]; then
 			exit -2
 		fi
 	elif (( pkgrel >= 2 )); then
-		pkgrel = 1
+		pkgrel=1
 		pkgrelline="${pkgrelline%=*}=$pkgrel"
 		sed -i "s/pkgrel=.\+/$pkgrelline/" PKGBUILD
 
