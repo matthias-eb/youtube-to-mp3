@@ -107,6 +107,7 @@ if [ $changes_made == "true" ]; then
 		if [ $? -ne 0 ]; then
 			echo "Building the package failed. Please check above. Terminating..."
 			revertCommits
+			removeFiles
 			exit -2
 		fi
 	elif (( pkgrel >= 2 )); then
@@ -119,6 +120,7 @@ if [ $changes_made == "true" ]; then
 		if [ $? -ne 0 ]; then
 			echo "Building the package failed. Please check above. Terminating..."
 			revertCommits
+			removeFiles
 			exit -2
 		fi
 	fi
