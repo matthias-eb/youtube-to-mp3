@@ -37,7 +37,17 @@ if [ -f "youtube-to-mp3_x86_64.deb" ]; then
 fi
 
 wget --no-check-certificate -O "youtube-to-mp3_i386.deb" "https://www.mediahuman.com/de/download/YouTubeToMP3.i386.deb" # Download 32 Bit File
+if [ $? -ne 0 ]; then
+	echo "Downloading .deb File failed. Please check the error above. Maybe an internet connection is not established?"
+	removeFiles
+	exit -1
+fi
 wget --no-check-certificate -O "youtube-to-mp3_x86_64.deb" "https://www.mediahuman.com/de/download/YouTubeToMP3.amd64.deb" # Download 64 Bit File
+if [ $? -ne 0 ]; then
+	echo "Downloading .deb File failed. Please check the error above. Maybe an internet connection is not established?"
+	removeFiles
+	exit -1
+fi
 
 # If the script is run for the first time, just create the files and upload them
 if [ ! -f md5sum_i386 ]; then
