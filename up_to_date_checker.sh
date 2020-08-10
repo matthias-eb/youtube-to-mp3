@@ -85,13 +85,13 @@ function update_md5_i386() {
 		changes_made=true
 		git add PKGBUILD
 		git commit -m "$MSG_32_SUM_CHANGED"
-		git checkout update_script
-		md5sum "youtube-to-mp3_i386.deb" > md5sum_i386
-		date --rfc-3339=date >> md5sum_i386
-		git add md5sum_i386
-		git commit -m "$MSG_32_SUM_CHANGED"
-		md5_changes=true
 	fi
+	git checkout update_script
+	md5sum "youtube-to-mp3_i386.deb" > md5sum_i386
+	date --rfc-3339=date >> md5sum_i386
+	git add md5sum_i386
+	git commit -m "$MSG_32_SUM_CHANGED"
+	md5_changes=true
 }
 
 function update_md5_x86_64() {
@@ -108,13 +108,13 @@ function update_md5_x86_64() {
 		changes_made=true
 		git add PKGBUILD
 		git commit -m "$MSG_64_SUM_CHANGED"
-		git checkout update_script
-		md5sum "youtube-to-mp3_x86_64.deb" > md5sum_x86_64
-		date --rfc-3339=date >> md5sum_x86_64
-		git add md5sum_x86_64
-		git commit -m "$MSG_64_SUM_CHANGED"
-		md5_changes=true
 	fi
+	git checkout update_script
+	md5sum "youtube-to-mp3_x86_64.deb" > md5sum_x86_64
+	date --rfc-3339=date >> md5sum_x86_64
+	git add md5sum_x86_64
+	git commit -m "$MSG_64_SUM_CHANGED"
+	md5_changes=true
 }
 
 function buildPackage() {
