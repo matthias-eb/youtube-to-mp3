@@ -43,11 +43,11 @@ function revertCommits() {
 
 function removeFiles() {
 	## Try to delete those Files while ignoring the output
-	rm "youtube-to-mp3_i386.deb" > /dev/null 2>&1
-	rm "youtube-to-mp3_x86_64.deb" > /dev/null 2>&1
-	rm "*.pkg.tar.xz" > /dev/null 2>&1
-	rm "*.pkg.tar.zst" > /dev/null 2>&1
-	rm "*.part" > /dev/null 2>&1
+	rm youtube-to-mp3_i386.deb > /dev/null 2>&1
+	rm youtube-to-mp3_x86_64.deb > /dev/null 2>&1
+	rm *.pkg.tar.xz > /dev/null 2>&1
+	rm *.pkg.tar.zst > /dev/null 2>&1
+	rm *.part > /dev/null 2>&1
 }
 
 function getSources_i386() {
