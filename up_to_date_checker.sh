@@ -30,9 +30,10 @@ function revertCommits() {
 		if [ "$last_commit" = "$MSG_DATE_ADDED" ]; then
 			# To be tested. For now, just abort.
 			# git reset --keep HEAD~1
+			echo -e "${RED}Date commit recognized. Stopping for now. Please remove any commits that you don't want by hand.${NC}"
 			break
 		else
-			echo "Removing following commit:" 
+			echo -e "${RED}Removing following commit:${NC}" 
 			git log -1
 			git reset --hard HEAD~1
 		fi
@@ -54,7 +55,7 @@ function getSources_i386() {
 	# Download i386 source
 	wget --no-check-certificate -O "youtube-to-mp3_i386.deb" "https://www.mediahuman.com/de/download/YouTubeToMP3.i386.deb" # Download 32 Bit File
 	if [ $? -ne 0 ]; then
-		echo "Downloading .deb File failed. Please check the error above. Maybe an internet connection is not established?"
+		echo -e "${RED}Downloading .deb File failed. Please check the error above. Maybe an internet connection is not established?${NC}"
 		removeFiles
 		exit -1
 	fi
@@ -64,7 +65,7 @@ function getSources_x86_64() {
 	# Download sources for x86_64 Architecture
 	wget --no-check-certificate -O "youtube-to-mp3_x86_64.deb" "https://www.mediahuman.com/de/download/YouTubeToMP3.amd64.deb" # Download 64 Bit File
 	if [ $? -ne 0 ]; then
-		echo "Downloading .deb File failed. Please check the error above. Maybe an internet connection is not established?"
+		echo -e "${RED}Downloading .deb File failed. Please check the error above. Maybe an internet connection is not established?${NC}"
 		removeFiles
 		exit -1
 	fi
@@ -120,18 +121,22 @@ function update_md5_x86_64() {
 function buildPackage() {
 	makepkg -cf
 	if [ $? -ne 0 ]; then
-		echo "Building the package failed. Please check above. Terminating..."
+		echo -e "${RED}Building the package failed. Please check above. Reverting commits..."
 		revertCommits
+		echo -e "...done. Removing created files..."
 		removeFiles
+		echo -e "...done. Exiting.${NC}"
 		exit -2
 	fi
 }
 
 
 if [ -f "youtube-to-mp3_i386.deb" ]; then
+	echo -e "${RED}Deleting existing 'youtube-to-mp3_i386.deb' file..${NC}"
 	rm "youtube-to-mp3_i386.deb"
 fi
 if [ -f "youtube-to-mp3_x86_64.deb" ]; then
+	echo -e "${RED}Deleting existing 'youtube-to-mp3_x86_64.deb' file..${NC}"
 	rm "youtube-to-mp3_x86_64.deb"
 fi
 
@@ -251,7 +256,7 @@ if [ $changes_made == "true" ]; then
 	echo "Pushing PKGBUILD and .SRCINFO to home repository.."
 	git push origin master
 	if [ $? -ne 0 ]; then
-		echo "Pushing failed. Please check for errors."
+		echo -e "${RED}Pushing failed. Please check for errors.${NC}"
 		exit -3
 	fi
 fi
@@ -261,6 +266,6 @@ if [ "$md5_changes" == "true" ]; then
 	echo "Pushing the updated checksums to the home repository"
 	git checkout update_script
 	git push
+	echo "Push successful."
 fi
-
 removeFiles
