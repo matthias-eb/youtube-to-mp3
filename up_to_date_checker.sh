@@ -104,7 +104,7 @@ function update_md5_x86_64() {
 		echo -e "${RED}Md5sum for Architecture x86_64 changed! Updating.${NC}"
 		# Get the md5sum from the deb File
 		md5_x86_64=$(md5sum "youtube-to-mp3_x86_64.deb" | cut -d ' ' -f 1)
-		# Replace the first line in PKGBUILD starting with md5sums_i386=( with the same string and the added new md5sum as well as a ")"
+		# Replace the first line in PKGBUILD starting with 'md5sums_i386=(' with that same string and the added new md5sum as well as a ')'"
 		sed -i "s/md5sums_x86_64=(.\+/md5sums_x86_64=(\"${md5_x86_64}\")/" PKGBUILD
 		changes_made=true
 		git add PKGBUILD
