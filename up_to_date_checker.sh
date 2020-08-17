@@ -12,7 +12,9 @@
 ## PKGBUILD and .SRCINFO are located in the master branch. This Branch is pushed to the aur and origin remote master branches.
 
 MSG_32_SUM_CHANGED="32 Bit md5sum changed for PKGBUILD"
+MSG_32_DATE_CHANGED="Date of the 32 Bit md5sum file changed"
 MSG_64_SUM_CHANGED="64 Bit md5sum changed for PKGBUILD"
+MSG_64_DATE_CHANGED="Date of the 64 Bit md5sum file changed"
 MSG_DATE_ADDED="Date added for checksum File"
 
 RED='\033[0;31m'
@@ -72,50 +74,95 @@ function getSources_x86_64() {
 }
 
 function update_md5_i386() {
+	# Check if the md5sum still matches
 	md5sum -c md5sum_i386 --status
 	if [ $? -eq 0 ]; then
-		echo "File 'youtube-to-mp3_i386.deb' OK."
+		# The checksum matches
+		# Change to the correct branch if necessary
+		if [ "$(git branch --show-current)" != "update_script" ]; then
+			git checkout update_script
+		fi
+		# Check, if the date still matches
+		if [ "$(date --rafc-3339=date)" != "$(sed '2q;d' md5sum_i386)" ]; then
+			echo "Changing date for 32 Bit md5sum file"
+			# If the date does'nt match, replace the second line in the file with the new md5sum
+			sed -i "2s/.*/$(date --rfc-3339=date)/" md5sum_i386
+			git add md5sum_i386
+			git commit -m "$MSG_32_DATE_CHANGED"
+			md5_changes=true
+		else
+			echo "File 'youtube-to-mp3_i386.deb' OK."
+		fi
 	else
-		git checkout master
+		# The md5sum changed. We need to replace it in both the PKGBUILD and the md5sum file.
+		# Change to the correct branch if necessary
+		if [ "$(git branch --show-current)" != "master" ]; then
+			git checkout master
+		fi
 		echo -e "${RED}Md5sum for Architecture i386 changed! Updating.${NC}"
 		# Get the md5sum from the deb File
 		md5_i386=$(md5sum "youtube-to-mp3_i386.deb" | cut -d ' ' -f 1)
 		# Replace the first line in PKGBUILD starting with md5sums_i386=( with the same string and the added new md5sum as well as a ")"
-		sed -i "s/md5sums_i386=(.\+/md5sums_i386=(\"${md5_i386}\")/" PKGBUILD 
-		
+		sed -i "s/md5sums_i386=(.\+/md5sums_i386=(\"${md5_i386}\")/" PKGBUILD
+		# Set the flag to push the master branch of the aur and origin 
 		changes_made=true
 		git add PKGBUILD
 		git commit -m "$MSG_32_SUM_CHANGED"
+
+		# Now, rewrite the md5sum file and commit to the update_script branch as well 
+		git checkout update_script
+		md5sum "youtube-to-mp3_i386.deb" > md5sum_i386
+		date --rfc-3339=date >> md5sum_i386
+		git add md5sum_i386
+		git commit -m "$MSG_32_SUM_CHANGED"
+		# Set the flag to push to the update_script branch
+		md5_changes=true
 	fi
-	git checkout update_script
-	md5sum "youtube-to-mp3_i386.deb" > md5sum_i386
-	date --rfc-3339=date >> md5sum_i386
-	git add md5sum_i386
-	git commit -m "$MSG_32_SUM_CHANGED"
-	md5_changes=true
 }
 
 function update_md5_x86_64() {
 	md5sum -c md5sum_x86_64 --status
 	if [ $? -eq 0 ]; then
-		echo "File 'youtube-to-mp3_x86_64.deb' OK."
+		# The checksum matches
+		# Change to the correct branch if necessary
+		if [ "$(git branch --show-current)" != "update_script" ]; then
+			git checkout update_script
+		fi
+		# Check, if the date still matches
+		if [ "$(date --rafc-3339=date)" != "$(sed '2q;d' md5sum_x86_64)" ]; then
+			echo "Changing date for 64 Bit md5sum file"
+			sed -i "2s/.*/$(date --rfc-3339=date)/" md5sum_x86_64
+			git add md5sum_x86_64
+			git commit -m "$MSG_64_DATE_CHANGED"
+			md5_changes=true
+		else
+			echo "File 'youtube-to-mp3_x86_64.deb' OK."
+		fi
 	else
-		git checkout master
+		# The md5sum changed. We need to replace it in both the PKGBUILD and the md5sum file.
+		# Change to the correct branch if necessary
+		if [ "$(git branch --show-current)" != "master" ]; then
+			git checkout master
+		fi
 		echo -e "${RED}Md5sum for Architecture x86_64 changed! Updating.${NC}"
 		# Get the md5sum from the deb File
 		md5_x86_64=$(md5sum "youtube-to-mp3_x86_64.deb" | cut -d ' ' -f 1)
-		# Replace the first line in PKGBUILD starting with 'md5sums_i386=(' with that same string and the added new md5sum as well as a ')'"
+		# Replace the first line in PKGBUILD starting with 'md5sums_x86_64=(' with that same string and the added new md5sum as well as a ')'"
 		sed -i "s/md5sums_x86_64=(.\+/md5sums_x86_64=(\"${md5_x86_64}\")/" PKGBUILD
+		# Set the flag to push the master branch of the aur and origin
 		changes_made=true
 		git add PKGBUILD
 		git commit -m "$MSG_64_SUM_CHANGED"
+
+		# Now, rewrite the md5sum file and commit to the update_script branch as well 
+		git checkout update_script
+		md5sum "youtube-to-mp3_x86_64.deb" > md5sum_x86_64
+		date --rfc-3339=date >> md5sum_x86_64
+		git add md5sum_x86_64
+		git commit -m "$MSG_64_SUM_CHANGED"
+		# Set the flag to push to the update_script branch
+		md5_changes=true
 	fi
-	git checkout update_script
-	md5sum "youtube-to-mp3_x86_64.deb" > md5sum_x86_64
-	date --rfc-3339=date >> md5sum_x86_64
-	git add md5sum_x86_64
-	git commit -m "$MSG_64_SUM_CHANGED"
-	md5_changes=true
 }
 
 function buildPackage() {
