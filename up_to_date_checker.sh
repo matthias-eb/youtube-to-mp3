@@ -140,6 +140,7 @@ if [ -f "youtube-to-mp3_x86_64.deb" ]; then
 	rm "youtube-to-mp3_x86_64.deb"
 fi
 
+echo "The current date is: $(date --rfc-3339=date)"
 if [ -f md5sum_i386 ]; then
 	
 	# Test, if the date in the md5sum File is existant and if so, if it equals the current date in rfc-3339 format
