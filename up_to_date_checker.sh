@@ -313,7 +313,7 @@ if [ "$md5_changes" == "true" ]; then
 	# Now pushing the md5sums
 	echo "Pushing the updated checksums to the home repository"
 	git checkout update_script
-	git push
+	git push -v origin update_script
 	echo "Push successful."
 fi
 removeFiles
