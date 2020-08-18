@@ -129,7 +129,7 @@ function update_md5_x86_64() {
 			git checkout update_script
 		fi
 		# Check, if the date still matches
-		if [ "$(date --rafc-3339=date)" != "$(sed '2q;d' md5sum_x86_64)" ]; then
+		if [ "$(date --rfc-3339=date)" != "$(sed '2q;d' md5sum_x86_64)" ]; then
 			echo "Changing date for 64 Bit md5sum file"
 			sed -i "2s/.*/$(date --rfc-3339=date)/" md5sum_x86_64
 			git add md5sum_x86_64
