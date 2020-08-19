@@ -313,8 +313,7 @@ if [ "$md5_changes" == "true" ]; then
 	# Now pushing the md5sums
 	echo "Pushing the updated checksums to the home repository"
 	git checkout update_script
-	echo "The current User is:\n$(who)"
-	git push origin update_script
+	GIT_SSH_COMMAND='ssh -i ~/.ssh/id_rsa' git push
 	echo "Push successful."
 fi
 removeFiles
