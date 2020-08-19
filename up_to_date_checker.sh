@@ -23,22 +23,19 @@ changes_made=false
 skip=false
 md5_changes=false
 
+# This function resets all commits from today that have a Commit message, that this script inserted. 
+# This means that this script will run again after fixing the problem that led to reverting the commits since the date commit is thrown away as well.
+# This function prevents pushing wrong sha256 sums to the git repository.
 function revertCommits() {
 	## Revert committed changes
 	last_commit=$(git log -1 --format=format:%s)
 	commit_date=$(git log -1 --date=short --format=format:%cd)
 	# Remove tha last commit as long as it has the current date and 
 	while [ \( "$last_commit" = "$MSG_32_SUM_CHANGED" -o "$last_commit" = "$MSG_64_SUM_CHANGED" -o "$last_commit" = "$MSG_DATE_ADDED" \) -a \( "$commit_date" = "$(date --rfc-3339=date)" \) ]; do
-		if [ "$last_commit" = "$MSG_DATE_ADDED" ]; then
-			# To be tested. For now, just abort.
-			# git reset --keep HEAD~1
-			echo -e "${RED}Date commit recognized. Stopping for now. Please remove any commits that you don't want by hand.${NC}"
-			break
-		else
-			echo -e "${RED}Removing following commit:${NC}" 
-			git log -1
-			git reset --hard HEAD~1
-		fi
+		echo -e "${RED}Removing following commit:${NC}" 
+		git log -1
+		git reset --hard HEAD~1
+		
 		last_commit=$(git log -1 --format=format:%s)
 		commit_date=$(git log -1 --date=short --format=format:%cd)
 	done
@@ -313,7 +310,7 @@ if [ "$md5_changes" == "true" ]; then
 	# Now pushing the md5sums
 	echo "Pushing the updated checksums to the home repository"
 	git checkout update_script
-	GIT_SSH_COMMAND='ssh -i ~/.ssh/id_rsa' git push
+	git push
 	echo "Push successful."
 fi
 removeFiles
