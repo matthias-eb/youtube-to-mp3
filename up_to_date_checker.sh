@@ -80,7 +80,7 @@ function update_md5_i386() {
 			git checkout update_script
 		fi
 		# Check, if the date still matches
-		if [ "$(date --rafc-3339=date)" != "$(sed '2q;d' md5sum_i386)" ]; then
+		if [ "$(date --rfc-3339=date)" != "$(sed '2q;d' md5sum_i386)" ]; then
 			echo "Changing date for 32 Bit md5sum file"
 			# If the date does'nt match, replace the second line in the file with the new md5sum
 			sed -i "2s/.*/$(date --rfc-3339=date)/" md5sum_i386
