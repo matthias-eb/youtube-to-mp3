@@ -106,6 +106,7 @@ function update_md5_i386() {
 	if [ $? -eq 0 ]; then
 		# The checksum matches
 		# Change to the correct branch if necessary
+		if [ "$(git branch --show-current)" != "update_script" ]; then
 			git checkout update_script
 		fi
 		# Check, if the date still matches
