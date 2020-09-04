@@ -48,6 +48,7 @@ MSG_DATE_ADDED="Date added for checksum File"
 changes_made=false
 skip=false
 md5_changes=false
+files_created=false
 
 
 function output_new_commit() {
@@ -76,18 +77,21 @@ function revertCommits() {
 }
 
 function removeFiles() {
-	## Try to delete those Files while ignoring the output
-	$OPT_REM_FILES
+	## Try to delete those Files while ignoring the output, if files were created
+	if [ "$files_created" = "true" ]; then
+		$OPT_REM_FILES
 
-	rm youtube-to-mp3_i386.deb > /dev/null 2>&1
-	rm youtube-to-mp3_x86_64.deb > /dev/null 2>&1
-	rm *.pkg.tar.xz > /dev/null 2>&1
-	rm *.pkg.tar.zst > /dev/null 2>&1
-	rm *.part > /dev/null 2>&1
+		rm youtube-to-mp3_i386.deb > /dev/null 2>&1
+		rm youtube-to-mp3_x86_64.deb > /dev/null 2>&1
+		rm *.pkg.tar.xz > /dev/null 2>&1
+		rm *.pkg.tar.zst > /dev/null 2>&1
+		rm *.part > /dev/null 2>&1
+	fi
 }
 
 function getSources_i386() {
 	# Download i386 source
+	files_created=true
 	wget --no-check-certificate -O "youtube-to-mp3_i386.deb" "https://www.mediahuman.com/de/download/YouTubeToMP3.i386.deb" # Download 32 Bit File
 	if [ $? -ne 0 ]; then
 		$OPT_ERR_DOWNLOAD
@@ -98,6 +102,7 @@ function getSources_i386() {
 
 function getSources_x86_64() {
 	# Download sources for x86_64 Architecture
+	files_created=true
 	wget --no-check-certificate -O "youtube-to-mp3_x86_64.deb" "https://www.mediahuman.com/de/download/YouTubeToMP3.amd64.deb" # Download 64 Bit File
 	if [ $? -ne 0 ]; then
 		$OPT_ERR_DOWNLOAD
@@ -208,6 +213,7 @@ function update_md5_x86_64() {
 }
 
 function buildPackage() {
+	files_created=true
 	makepkg -cf
 	if [ $? -ne 0 ]; then
 		$OPT_ERR_BUILD_FAIL
