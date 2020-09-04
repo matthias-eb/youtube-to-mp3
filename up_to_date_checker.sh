@@ -27,7 +27,9 @@ OPT_RESET="echo ${BOLD}${RED}${BG_WHITE}==> Removing commits:${RS}${BG_WHITE}" #
 OPT_DATE_UPDATE_32="echo ${BOLD}==> 32 Checksum OK, refreshing date...${RS}"
 OPT_DATE_UPDATE_64="echo ${BOLD}==> 64 Checksum OK, refreshing date...${RS}"
 OPT_32_OK="echo ${BOLD}==> 32 Checksum OK${RS}"
+OPT_32_DATE_SKIP="echo ${BOLD}==> 32 Bit checksum was already checked today. Skipping."
 OPT_64_OK="echo ${BOLD}==> 64 Checksum OK${RS}"
+OPT_64_DATE_SKIP="echo ${BOLD}==> 64 Bit checksum was already checked today. Skipping."
 OPT_DONE="echo ${BOLD}==> ...done${RS}"
 OPT_REM_FILES="echo ${BOLD}==> Removing created files.${RS}"
 OPT_MD5_32_CHANGED="echo ${BOLD}${RED}==> Md5sum for Architecture i386 changed! Updating.${RS}"
@@ -233,7 +235,7 @@ if [ -f md5sum_i386 ]; then
 		md5_date_i386="$(sed -n '2,2p' md5sum_i386)"
 		if [ "$md5_date_i386" == "$(date --rfc-3339=date)" ]; then
 			# If the date is the same, the file does not need to be updated. Proceed with the next one
-			$OPT_32_OK
+			$OPT_32_DATE_SKIP
 			skip=true
 		fi
 	else
@@ -270,7 +272,7 @@ if [ -f md5sum_x86_64 ]; then
 		md5_date_x86_64="$(sed -n '2,2p' md5sum_x86_64)"
 		if [ "$md5_date_x86_64" == "$(date --rfc-3339=date)" ]; then
 			# This md5sum is up to date, the date is the same.
-			$OPT_64_OK
+			$OPT_64_DATE_SKIP
 			skip=true
 		fi
 	else
