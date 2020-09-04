@@ -23,7 +23,6 @@ RS="$(tput sgr 0)" # Reset Color and font
 OPT_PUSH_AUR="echo ${BOLD}==> Pushing to AUR remote repository...${RS}"
 OPT_PUSH_MASTER="echo ${BOLD}==> Pushing to origin master branch...\t${RS}"
 OPT_PUSH_UPDATE_SCRIPT="echo ${BOLD}==> Pushing to origin update_script branch...\t${RS}"
-OPT_NEW_COMMIT="echo ${BOLD}${GREEN}==> New Commit for branch $(git branch --show-current) created. Commit Message: $(git log -1 --format=format:%s)${RS}"
 OPT_RESET="echo ${BOLD}${RED}${BG_WHITE}==> Removing commits:${RS}${BG_WHITE}" # Intro for the Resets. Keeps the White background to clarify what belongs to the Reset. Needs to be Reset afterwards
 OPT_DATE_UPDATE_32="echo ${BOLD}==> 32 Checksum OK, refreshing date...${RS}"
 OPT_DATE_UPDATE_64="echo ${BOLD}==> 64 Checksum OK, refreshing date...${RS}"
@@ -47,6 +46,11 @@ MSG_DATE_ADDED="Date added for checksum File"
 changes_made=false
 skip=false
 md5_changes=false
+
+
+function output_new_commit() {
+	echo "${BOLD}${GREEN}==> New Commit for branch $(git branch --show-current) created. Commit Message: $(git log -1 --format=format:%s)${RS}"
+}
 
 # This function resets all commits from today that have a Commit message, that this script inserted. 
 # This means that this script will run again after fixing the problem that led to reverting the commits since the date commit is thrown away as well.
@@ -116,7 +120,7 @@ function update_md5_i386() {
 			sed -i "2s/.*/$(date --rfc-3339=date)/" md5sum_i386
 			git add md5sum_i386 > /dev/null
 			git commit -m "$MSG_32_DATE_CHANGED" > /dev/null
-			$OPT_NEW_COMMIT
+			output_new_commit
 			md5_changes=true
 		else
 			$OPT_32_OK
@@ -144,7 +148,7 @@ function update_md5_i386() {
 		git add md5sum_i386 > /dev/null
 		git commit -m "$MSG_32_SUM_CHANGED" > /dev/null
 
-		$OPT_NEW_COMMIT
+		output_new_commit
 
 		# Set the flag to push to the update_script branch
 		md5_changes=true
@@ -166,7 +170,7 @@ function update_md5_x86_64() {
 			sed -i "2s/.*/$(date --rfc-3339=date)/" md5sum_x86_64
 			git add md5sum_x86_64 > /dev/null
 			git commit -m "$MSG_64_DATE_CHANGED" > /dev/null
-			$OPT_NEW_COMMIT
+			output_new_commit
 			md5_changes=true
 		else
 			$OPT_64_OK
@@ -187,7 +191,7 @@ function update_md5_x86_64() {
 		git add PKGBUILD > /dev/null
 		git commit -m "$MSG_64_SUM_CHANGED" > /dev/null
 
-		$OPT_NEW_COMMIT
+		output_new_commit
 
 		# Now, rewrite the md5sum file and commit to the update_script branch as well 
 		git checkout update_script
@@ -195,7 +199,7 @@ function update_md5_x86_64() {
 		date --rfc-3339=date >> md5sum_x86_64
 		git add md5sum_x86_64 > /dev/null
 		git commit -m "$MSG_64_SUM_CHANGED" > /dev/null
-		$OPT_NEW_COMMIT
+		output_new_commit
 		# Set the flag to push to the update_script branch
 		md5_changes=true
 	fi
@@ -237,7 +241,7 @@ if [ -f md5sum_i386 ]; then
 		date --rfc-3339=date >> md5sum_i386
 		git add md5sum_i386 > /dev/null
 		git commit -m "$MSG_DATE_ADDED" > /dev/null
-		$OPT_NEW_COMMIT
+		output_new_commit
 		# Set md5changes to true to absolutely push the md5sum Files, even if they are not with new checksums.
 		md5_changes=true
 	fi
@@ -274,7 +278,7 @@ if [ -f md5sum_x86_64 ]; then
 		date --rfc-3339=date >> md5sum_x86_64
 		git add md5sum_x86_64 > /dev/null
 		git commit -m "$MSG_DATE_ADDED" > /dev/null
-		$OPT_NEW_COMMIT
+		output_new_commit
 		# Set md5changes to true to absolutely push the md5sum Files, even if they are not with new checksums.
 		md5_changes=true
 	fi
@@ -322,7 +326,7 @@ if [ $changes_made == "true" ]; then
 	makepkg --printsrcinfo > .SRCINFO
 	git add PKGBUILD .SRCINFO
 	git commit -m ".SRCINFO regenerated, updated Package Version to ${pkgverline#*=} and Package Release Nr. to $pkgrel" > /dev/null
-	$OPT_NEW_COMMIT
+	output_new_commit
 
 	# Update repository
 	git status -sb
