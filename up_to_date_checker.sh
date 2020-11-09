@@ -34,9 +34,9 @@ OPT_DONE="echo ${BOLD}==> ...done${RS}"
 OPT_REM_FILES="echo ${BOLD}==> Removing created files.${RS}"
 OPT_MD5_32_CHANGED="echo ${BOLD}${RED}==> Md5sum for Architecture i386 changed! Updating.${RS}"
 OPT_MD5_64_CHANGED="echo ${BOLD}${RED}==> Md5sum for Architecture x86_64 changed! Updating.${RS}"
-OPT_ERR_DOWNLOAD="echo ${BOLD}${RED}Downloading .deb File failed. Please check the error above. Maybe an internet connection is not established?${RS}"
-OPT_ERR_BUILD_FAIL="echo ${BOLD}${RED}Building the package failed. Please check above. Reverting commits..."
-OPT_ERR_PUSH="echo ${BOLD}${RED}Pushing failed. Please check above for errors.${RS}"
+OPT_ERR_DOWNLOAD="1>&2 echo ${BOLD}${RED}Downloading .deb File failed. Please check the error above. Maybe an internet connection is not established?${RS}"
+OPT_ERR_BUILD_FAIL="1>&2 echo ${BOLD}${RED}Building the package failed. Please check above. Reverting commits..."
+OPT_ERR_PUSH="1>&2 echo ${BOLD}${RED}Pushing failed. Please check above for errors.${RS}"
 OPT_EXIT_SCRIPT="echo ${BOLD}Finished.${RS}"
 
 MSG_32_SUM_CHANGED="32 Bit md5sum changed for PKGBUILD"
@@ -50,6 +50,22 @@ skip=false
 md5_changes=false
 files_created=false
 
+
+function checkArguments() {
+	while [[ $# -gt 0 ]]
+	do
+		option=$1
+
+		case $option in
+			-f || --force)
+			force=true
+			echo "Force option activated"
+			shift	## shift Parameters to the left, $1 is now $2
+			;;
+
+		esac
+	done
+}
 
 function output_new_commit() {
 	echo "${BOLD}${GREEN}==> New Commit for branch $(git branch --show-current) created. Commit Message: $(git log -1 --format=format:%s)${RS}"
@@ -224,6 +240,9 @@ function buildPackage() {
 }
 
 
+#### Main Script start ####
+
+
 if [ -f "youtube-to-mp3_i386.deb" ]; then
 	echo -e "${RED}Deleting existing 'youtube-to-mp3_i386.deb' file..${RS}"
 	rm "youtube-to-mp3_i386.deb"
@@ -233,25 +252,33 @@ if [ -f "youtube-to-mp3_x86_64.deb" ]; then
 	rm "youtube-to-mp3_x86_64.deb"
 fi
 
+# Check for Option -f
+if [ $# -gt 0 ]; then
+	checkArguments
+fi
+
 echo "The current date is: $(date --rfc-3339=date)"
 if [ -f md5sum_i386 ]; then
 	
-	# Test, if the date in the md5sum File is existant and if so, if it equals the current date in rfc-3339 format
-	if [ "$(cat md5sum_i386 | wc -l)" == "2" ]; then
-		md5_date_i386="$(sed -n '2,2p' md5sum_i386)"
-		if [ "$md5_date_i386" == "$(date --rfc-3339=date)" ]; then
-			# If the date is the same, the file does not need to be updated. Proceed with the next one
-			$OPT_32_DATE_SKIP
-			skip=true
+	# Skip date check if force option is active
+	if [ $force != "true" ]; then
+		# Test, if the date in the md5sum File is existant and if so, if it equals the current date in rfc-3339 format
+		if [ "$(cat md5sum_i386 | wc -l)" == "2" ]; then
+			md5_date_i386="$(sed -n '2,2p' md5sum_i386)"
+			if [ "$md5_date_i386" == "$(date --rfc-3339=date)" ]; then
+				# If the date is the same, the file does not need to be updated. Proceed with the next one
+				$OPT_32_DATE_SKIP
+				skip=true
+			fi
+		else
+			# If the date line does not exist, add and commit it.
+			date --rfc-3339=date >> md5sum_i386
+			git add md5sum_i386 > /dev/null
+			git commit -m "$MSG_DATE_ADDED" > /dev/null
+			output_new_commit
+			# Set md5changes to true to absolutely push the md5sum Files, even if they are not with new checksums.
+			md5_changes=true
 		fi
-	else
-		# If the date line does not exist, add and commit it.
-		date --rfc-3339=date >> md5sum_i386
-		git add md5sum_i386 > /dev/null
-		git commit -m "$MSG_DATE_ADDED" > /dev/null
-		output_new_commit
-		# Set md5changes to true to absolutely push the md5sum Files, even if they are not with new checksums.
-		md5_changes=true
 	fi
 
 	if [ "$skip" == "false" ]; then
