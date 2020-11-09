@@ -260,25 +260,25 @@ fi
 echo "The current date is: $(date --rfc-3339=date)"
 if [ -f md5sum_i386 ]; then
 	
-	# Skip date check if force option is active
-	if [ $force != "true" ]; then
-		# Test, if the date in the md5sum File is existant and if so, if it equals the current date in rfc-3339 format
-		if [ "$(cat md5sum_i386 | wc -l)" == "2" ]; then
-			md5_date_i386="$(sed -n '2,2p' md5sum_i386)"
-			if [ "$md5_date_i386" == "$(date --rfc-3339=date)" ]; then
+	# Test, if the date in the md5sum File is existant and if so, if it equals the current date in rfc-3339 format
+	if [ "$(cat md5sum_i386 | wc -l)" == "2" ]; then
+		md5_date_i386="$(sed -n '2,2p' md5sum_i386)"
+		if [ "$md5_date_i386" == "$(date --rfc-3339=date)" ]; then
+			# Skip date check if force option is active
+			if [ $force != "true" ]; then
 				# If the date is the same, the file does not need to be updated. Proceed with the next one
 				$OPT_32_DATE_SKIP
 				skip=true
 			fi
-		else
-			# If the date line does not exist, add and commit it.
-			date --rfc-3339=date >> md5sum_i386
-			git add md5sum_i386 > /dev/null
-			git commit -m "$MSG_DATE_ADDED" > /dev/null
-			output_new_commit
-			# Set md5changes to true to absolutely push the md5sum Files, even if they are not with new checksums.
-			md5_changes=true
 		fi
+	else
+		# If the date line does not exist, add and commit it.
+		date --rfc-3339=date >> md5sum_i386
+		git add md5sum_i386 > /dev/null
+		git commit -m "$MSG_DATE_ADDED" > /dev/null
+		output_new_commit
+		# Set md5changes to true to absolutely push the md5sum Files, even if they are not with new checksums.
+		md5_changes=true
 	fi
 
 	if [ "$skip" == "false" ]; then
@@ -304,9 +304,12 @@ if [ -f md5sum_x86_64 ]; then
 	if [ "$(cat md5sum_x86_64 | wc -l)" == "2" ]; then
 		md5_date_x86_64="$(sed -n '2,2p' md5sum_x86_64)"
 		if [ "$md5_date_x86_64" == "$(date --rfc-3339=date)" ]; then
-			# This md5sum is up to date, the date is the same.
-			$OPT_64_DATE_SKIP
-			skip=true
+			# Skip date check if force option is active
+			if [ $force != "true" ]; then
+				# This md5sum is up to date, the date is the same.
+				$OPT_64_DATE_SKIP
+				skip=true
+			fi
 		fi
 	else
 		# If the date line does not exist, add and commit it.
