@@ -57,7 +57,7 @@ function checkArguments() {
 		option=$1
 
 		case $option in
-			-f || --force)
+			-f | --force)
 			force=true
 			echo "Force option activated"
 			shift	## shift Parameters to the left, $1 is now $2
