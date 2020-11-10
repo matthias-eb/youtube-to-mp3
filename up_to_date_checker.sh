@@ -49,6 +49,7 @@ changes_made=false
 skip=false
 md5_changes=false
 files_created=false
+force=false
 
 
 function checkArguments() {
