@@ -1,0 +1,6 @@
+[Desktop Entry]
+Exec=konsole --separate --hold -e ~/git/AUR/aur_maintainer.sh
+Icon=/usr/share/icons/bloom/apps/32/deepin-terminal.svg
+Name=Aur Maintainer
+Type=Application
+X-Deepin-Vendor=user-custom
