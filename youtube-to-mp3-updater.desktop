@@ -1,5 +1,6 @@
+#!/usr/bin/env xdg-open
 [Desktop Entry]
-Exec=konsole --separate --hold -e ~/git/AUR/aur_maintainer.sh
+Exec=konsole --separate --hold -e ~/git/youtube-to-mp3/up_to_date_checker.sh
 Icon=/usr/share/icons/bloom/apps/32/deepin-terminal.svg
 Name=Aur Maintainer
 Type=Application
