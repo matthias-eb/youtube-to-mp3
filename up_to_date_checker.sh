@@ -13,6 +13,7 @@
 
 
 
+BLACK="$(tput setaf 0)" # Black Foreground Color
 RED="$(tput setaf 1)" # Red Foreground Color
 GREEN="$(tput setaf 2)" # Green Foreground Color
 BG_WHITE="$(tput setab 7)" # White Background
@@ -23,7 +24,7 @@ RS="$(tput sgr 0)" # Reset Color and font
 OPT_PUSH_AUR="echo ${BOLD}==> Pushing to AUR remote repository...${RS}"
 OPT_PUSH_MASTER="echo ${BOLD}==> Pushing to origin master branch...\t${RS}"
 OPT_PUSH_UPDATE_SCRIPT="echo ${BOLD}==> Pushing to origin update_script branch...\t${RS}"
-OPT_RESET="echo ${BOLD}${RED}${BG_WHITE}==> Removing commits:${RS}${BG_WHITE}" # Intro for the Resets. Keeps the White background to clarify what belongs to the Reset. Needs to be Reset afterwards
+OPT_RESET="echo ${BOLD}${RED}${BG_WHITE}==> Removing commits:${RS}${BLACK}${BG_WHITE}" # Intro for the Resets. Keeps the White background to clarify what belongs to the Reset. Needs to be Reset afterwards
 OPT_DATE_UPDATE_32="echo ${BOLD}==> 32 Checksum OK, refreshing date...${RS}"
 OPT_DATE_UPDATE_64="echo ${BOLD}==> 64 Checksum OK, refreshing date...${RS}"
 OPT_32_OK="echo ${BOLD}==> 32 Checksum OK${RS}"
