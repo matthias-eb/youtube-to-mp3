@@ -1,7 +1,7 @@
 #!/usr/bin/env xdg-open
 [Desktop Entry]
-Exec=konsole --separate --hold -e ~/git/youtube-to-mp3/up_to_date_checker.sh
-Icon=/usr/share/icons/bloom/apps/32/deepin-terminal.svg
+Exec=konsole --workdir ~/git/youtube-to-mp3/ --separate --hold -e ~/git/youtube-to-mp3/updater.sh
+Icon=text-x-script.svg
 Name=Aur Maintainer
 Type=Application
 X-Deepin-Vendor=user-custom
