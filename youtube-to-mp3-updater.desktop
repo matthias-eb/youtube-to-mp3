@@ -1,6 +1,6 @@
 #!/usr/bin/env xdg-open
 [Desktop Entry]
-Exec=konsole --workdir ~/git/youtube-to-mp3/ --separate --hold -e ~/git/youtube-to-mp3/updater.sh
+Exec=konsole --workdir /run/media/mattes/SSD_500GB_Internal/Coding/git/youtube-to-mp3/ --separate --hold -e ./updater.sh
 Icon=text-x-script.svg
 Name=Aur Maintainer
 Type=Application
