@@ -259,10 +259,6 @@ if [ $# -gt 0 ]; then
 	checkArguments
 fi
 
-# Wait 3 seconds in order to have time to connect to the internet and other startup tasks to perform
-echo "Waiting 3 seconds before start... Press Ctrl+C If you don't want to check for updates."
-sleep 3
-
 echo "The current date is: $(date --rfc-3339=date)"
 if [ -f md5sum_i386 ]; then
 	
