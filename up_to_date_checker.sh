@@ -54,11 +54,12 @@ force=false
 
 
 function checkArguments() {
+	echo "Checking $# arguments.."
 	while [[ $# -gt 0 ]]
 	do
+		echo "Checking $1"
 		option=$1
-
-		case $option in
+		case $option in 
 			-f | --force)
 			force=true
 			echo "Force option activated"
@@ -256,7 +257,7 @@ fi
 
 # Check for Option -f
 if [ $# -gt 0 ]; then
-	checkArguments
+	checkArguments $@
 fi
 
 echo "The current date is: $(date --rfc-3339=date)"
@@ -267,7 +268,7 @@ if [ -f md5sum_i386 ]; then
 		md5_date_i386="$(sed -n '2,2p' md5sum_i386)"
 		if [ "$md5_date_i386" == "$(date --rfc-3339=date)" ]; then
 			# Skip date check if force option is active
-			if [ $force != "true" ]; then
+			if [ "$force" != "true" ]; then
 				# If the date is the same, the file does not need to be updated. Proceed with the next one
 				$OPT_32_DATE_SKIP
 				skip=true
@@ -307,7 +308,7 @@ if [ -f md5sum_x86_64 ]; then
 		md5_date_x86_64="$(sed -n '2,2p' md5sum_x86_64)"
 		if [ "$md5_date_x86_64" == "$(date --rfc-3339=date)" ]; then
 			# Skip date check if force option is active
-			if [ $force != "true" ]; then
+			if [ "$force" != "true" ]; then
 				# This md5sum is up to date, the date is the same.
 				$OPT_64_DATE_SKIP
 				skip=true
