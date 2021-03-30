@@ -58,8 +58,8 @@ function checkUpstreamMD5Sums() {
 	if [ "$(git branch --show-current)" != "aur/master" ]; then
 		git checkout aur/master
 	fi
-	aur_md5_i386 = "$(cat PKGBUILD | grep "md5sums_i386" | cut -d'"' -f 2)"
-	aur_md5_x86_64 = "$(cat PKGBUILD | grep "md5sums_x86_64" | cut -d'"' -f 2)"
+	aur_md5_i386="$(cat PKGBUILD | grep "md5sums_i386" | cut -d'"' -f 2)"
+	aur_md5_x86_64="$(cat PKGBUILD | grep "md5sums_x86_64" | cut -d'"' -f 2)"
 	echo "AUR MD5sums: $aur_md5_i386, $aur_md5_x86_64"
 	git checkout update_script
 }
