@@ -56,12 +56,24 @@ force=false
 function checkUpstreamMD5Sums() {
 	echo "=> Comparing MD5Sums from the AUR with the local files.."
 	if [ "$(git branch --show-current)" != "aur/master" ]; then
-		git checkout aur/master
+		git checkout aur/master > /dev/null
 	fi
 	aur_md5_i386="$(cat PKGBUILD | grep "md5sums_i386" | cut -d'"' -f 2)"
 	aur_md5_x86_64="$(cat PKGBUILD | grep "md5sums_x86_64" | cut -d'"' -f 2)"
-	echo "AUR MD5sums: $aur_md5_i386, $aur_md5_x86_64"
-	git checkout update_script
+	
+	# Checkout update_script and compare the checksums
+	git checkout update_script > /dev/null
+	if [ "$aur_md5_i386" != "$(sed '1q;d' md5sum_i386 | cut -d' ' -f 1)" ]; then
+		echo "The MD5sum for i386 Architecture is out of sync! Changing local MD5sum file..."
+		md5file="$(sed '1q;d' md5sum_i386 | cut -d' ' -f 2)"
+		sed -i "s/*${md5file}/${aur_md5_i386} ${md5file}/"
+	fi
+	if [ "$aur_md5_x86_64" != "$(sed '1q;d' md5sum_x86_64 | cut -d' ' -f 1)" ]; then
+		echo "The MD5sum for x86_64 Architecture is out of sync! Changing local MD5sum file..."
+		md5file="$(sed '1q;d' md5sum_x86_64 | cut -d' ' -f 2)"
+		sed -i "s/*${md5file}/${aur_md5_x86_64} ${md5file}/"
+	fi
+
 }
 
 function checkArguments() {
