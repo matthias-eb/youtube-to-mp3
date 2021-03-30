@@ -53,6 +53,17 @@ files_created=false
 force=false
 
 
+function checkUpstreamMD5Sums() {
+	echo "=> Comparing MD5Sums from the AUR with the local files.."
+	if [ "$(git branch --show-current)" != "aur/master" ]; then
+		git checkout aur/master
+	fi
+	aur_md5_i386 = "$(cat PKGBUILD | grep "md5sums_i386" | cut -d'"' -f 2)"
+	aur_md5_x86_64 = "$(cat PKGBUILD | grep "md5sums_x86_64" | cut -d'"' -f 2)"
+	echo "AUR MD5sums: $aur_md5_i386, $aur_md5_x86_64"
+	git checkout update_script
+}
+
 function checkArguments() {
 	echo "Checking $# arguments.."
 	while [[ $# -gt 0 ]]
@@ -256,6 +267,8 @@ fi
 
 # Check for Options
 checkArguments $@
+
+checkUpstreamMD5Sums
 
 echo "The current date is: $(date --rfc-3339=date)"
 if [ -f md5sum_i386 ]; then
