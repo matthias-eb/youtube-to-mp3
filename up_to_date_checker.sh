@@ -61,12 +61,11 @@ function checkArguments() {
 		option=$1
 		case $option in 
 			-f | --force)
-			force=true
+			force="true"
 			echo "Force option activated"
-			shift	## shift Parameters to the left, $1 is now $2
 			;;
-
 		esac
+		shift	## shift Parameters to the left, $1 is now $2
 	done
 }
 
@@ -149,6 +148,7 @@ function update_md5_i386() {
 			output_new_commit
 			md5_changes=true
 		else
+			echo "date matches and forse is not true"
 			$OPT_32_OK
 		fi
 	else
