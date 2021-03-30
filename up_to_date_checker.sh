@@ -148,7 +148,6 @@ function update_md5_i386() {
 			output_new_commit
 			md5_changes=true
 		else
-			echo "date matches and forse is not true"
 			$OPT_32_OK
 		fi
 	else
@@ -255,10 +254,8 @@ if [ -f "youtube-to-mp3_x86_64.deb" ]; then
 	rm "youtube-to-mp3_x86_64.deb"
 fi
 
-# Check for Option -f
-if [ $# -gt 0 ]; then
-	checkArguments $@
-fi
+# Check for Options
+checkArguments $@
 
 echo "The current date is: $(date --rfc-3339=date)"
 if [ -f md5sum_i386 ]; then
