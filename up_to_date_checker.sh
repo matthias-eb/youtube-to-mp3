@@ -22,9 +22,10 @@ RS="$(tput sgr 0)" # Reset Color and font
 
 # Output Messages
 OPT_PUSH_AUR="echo ${BOLD}==> Pushing to AUR remote repository...${RS}"
-OPT_PUSH_MASTER="echo ${BOLD}==> Pushing to origin master branch...\t${RS}"
-OPT_PUSH_UPDATE_SCRIPT="echo ${BOLD}==> Pushing to origin update_script branch...\t${RS}"
+OPT_PUSH_MASTER="echo -e ${BOLD}==> Pushing to origin master branch...\t${RS}"
+OPT_PUSH_UPDATE_SCRIPT="echo -e ${BOLD}==> Pushing to origin update_script branch...\t${RS}"
 OPT_RESET="echo ${BOLD}${RED}${BG_WHITE}==> Removing commits:${RS}${BLACK}${BG_WHITE}" # Intro for the Resets. Keeps the White background to clarify what belongs to the Reset. Needs to be Reset afterwards
+OPT_RESET_BRANCH="echo Resetting branch ${BOLD}$(git branch --show-current)${RS}${BLACK}${BG_WHITE}"
 OPT_DATE_UPDATE_32="echo ${BOLD}==> 32 Checksum OK, refreshing date...${RS}"
 OPT_DATE_UPDATE_64="echo ${BOLD}==> 64 Checksum OK, refreshing date...${RS}"
 OPT_32_OK="echo ${BOLD}==> 32 Checksum OK${RS}"
@@ -35,9 +36,9 @@ OPT_DONE="echo ${BOLD}==> ...done${RS}"
 OPT_REM_FILES="echo ${BOLD}==> Removing created files.${RS}"
 OPT_MD5_32_CHANGED="echo ${BOLD}${RED}==> Md5sum for Architecture i386 changed! Updating.${RS}"
 OPT_MD5_64_CHANGED="echo ${BOLD}${RED}==> Md5sum for Architecture x86_64 changed! Updating.${RS}"
-OPT_ERR_DOWNLOAD="1>&2 echo ${BOLD}${RED}Downloading .deb File failed. Please check the error above. Maybe an internet connection is not established?${RS}"
-OPT_ERR_BUILD_FAIL="1>&2 echo ${BOLD}${RED}Building the package failed. Please check above. Reverting commits..."
-OPT_ERR_PUSH="1>&2 echo ${BOLD}${RED}Pushing failed. Please check above for errors.${RS}"
+OPT_ERR_DOWNLOAD="echo ${BOLD}${RED}Downloading .deb File failed. Please check the error above. Maybe an internet connection is not established?${RS} 1>&2"
+OPT_ERR_BUILD_FAIL="echo ${BOLD}${RED}Building the package failed. Please check above. Reverting commits... 1>&2"
+OPT_ERR_PUSH="echo ${BOLD}${RED}Pushing failed. Please check above for errors.${RS} 1>&2"
 OPT_EXIT_SCRIPT="echo ${BOLD}Finished.${RS}"
 
 MSG_32_SUM_CHANGED="32 Bit md5sum changed for PKGBUILD"
@@ -108,19 +109,24 @@ function revertCommits() {
 
 	# Start white Background in console and Write first output
 	$OPT_RESET
-
-	last_commit=$(git log -1 --format=format:%s)
-	commit_date=$(git log -1 --date=short --format=format:%cd)
-	# Remove the last commit as long as it has the current date and the commit Message matches one of the specified commit messages.
-	while [ \( "$last_commit" = "$MSG_32_SUM_CHANGED" -o "$last_commit" = "$MSG_64_SUM_CHANGED" -o "$last_commit" = "$MSG_DATE_ADDED" \) -a \( "$commit_date" = "$(date --rfc-3339=date)" \) ]; do
-		echo "\n------------------------------\n"
-		git log -1 --format=format: "%aN created commit %Cred%h%Creset:%n" | cat
-		git reset --hard HEAD~1
-		
+	for i in 1 2; do
+		$OPT_RESET_BRANCH
 		last_commit=$(git log -1 --format=format:%s)
 		commit_date=$(git log -1 --date=short --format=format:%cd)
+		# Remove the last commit as long as it has the current date and the commit Message matches one of the specified commit messages.
+		while [ \( "$last_commit" = "$MSG_32_SUM_CHANGED" -o "$last_commit" = "$MSG_64_SUM_CHANGED" -o "$last_commit" = "$MSG_DATE_ADDED" \) -a \( "$commit_date" = "$(date --rfc-3339=date)" \) ]; do
+			echo "\n------------------------------\n"
+			git log -1 --format=fuller | cat
+			git reset --hard HEAD~1
+			
+			last_commit=$(git log -1 --format=format:%s)
+			commit_date=$(git log -1 --date=short --format=format:%cd)
+		done
+		git checkout master
+		$OPT_RESET_BRANCH
 	done
 	echo "$RS"
+	md5_changes=false
 }
 
 function removeFiles() {
