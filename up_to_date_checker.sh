@@ -101,7 +101,10 @@ function output_new_commit() {
 # This means that this script will run again after fixing the problem that led to reverting the commits since the date commit is thrown away as well.
 # This function prevents pushing wrong sha256 sums to the git repository.
 function revertCommits() {
-	### Revert update_script branch
+	# Remove hindering unversioned files 
+	echo "Removing unneeded files and directories..."
+	git clean -n
+	### Change first to update_script branch
 	# Change branch to update_script
 	if [ "$(git branch --show-current)" != "update_script" ]; then
 		git checkout update_script
