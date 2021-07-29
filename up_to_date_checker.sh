@@ -36,9 +36,9 @@ OPT_DONE="echo ${BOLD}==> ...done${RS}"
 OPT_REM_FILES="echo ${BOLD}==> Removing created files.${RS}"
 OPT_MD5_32_CHANGED="echo ${BOLD}${RED}==> Md5sum for Architecture i386 changed! Updating.${RS}"
 OPT_MD5_64_CHANGED="echo ${BOLD}${RED}==> Md5sum for Architecture x86_64 changed! Updating.${RS}"
-OPT_ERR_DOWNLOAD="echo ${BOLD}${RED}Downloading .deb File failed. Please check the error above. Maybe an internet connection is not established?${RS} 1>&2"
-OPT_ERR_BUILD_FAIL="echo ${BOLD}${RED}Building the package failed. Please check above. Reverting commits... 1>&2"
-OPT_ERR_PUSH="echo ${BOLD}${RED}Pushing failed. Please check above for errors.${RS} 1>&2"
+OPT_ERR_DOWNLOAD="echo ${BOLD}${RED}Downloading .deb File failed. Please check the error above. Maybe an internet connection is not established?${RS}"
+OPT_ERR_BUILD_FAIL="echo ${BOLD}${RED}Building the package failed. Please check above. Reverting commits...${RS}"
+OPT_ERR_PUSH="echo ${BOLD}${RED}Pushing failed. Please check above for errors.${RS}"
 OPT_EXIT_SCRIPT="echo ${BOLD}Finished.${RS}"
 
 MSG_32_SUM_CHANGED="32 Bit md5sum changed for PKGBUILD"
@@ -115,7 +115,7 @@ function revertCommits() {
 		commit_date=$(git log -1 --date=short --format=format:%cd)
 		# Remove the last commit as long as it has the current date and the commit Message matches one of the specified commit messages.
 		while [ \( "$last_commit" = "$MSG_32_SUM_CHANGED" -o "$last_commit" = "$MSG_64_SUM_CHANGED" -o "$last_commit" = "$MSG_DATE_ADDED" \) -a \( "$commit_date" = "$(date --rfc-3339=date)" \) ]; do
-			echo "\n------------------------------\n"
+			echo -e "\n------------------------------\n"
 			git log -1 --format=fuller | cat
 			git reset --hard HEAD~1
 			
