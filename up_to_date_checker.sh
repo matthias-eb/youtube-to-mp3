@@ -102,6 +102,7 @@ function output_new_commit() {
 function revertCommits() {
 	# Remove hindering unversioned files 
 	echo "Removing unneeded files and directories..."
+	git clean -df
 	git stash
 	git stash drop
 	### Change first to update_script branch
