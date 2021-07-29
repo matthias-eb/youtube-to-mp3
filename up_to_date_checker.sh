@@ -116,14 +116,15 @@ function revertCommits() {
 		echo "Resetting branch ${BOLD}$(git branch --show-current)${RS}${BLACK}${BG_WHITE}"
 		last_commit=$(git log -1 --format=format:%s)
 		commit_date=$(git log -1 --date=short --format=format:%cd)
+		echo -e "\n------------------------------\n"
 		# Remove the last commit as long as it has the current date and the commit Message matches one of the specified commit messages.
 		while [ \( "$last_commit" = "$MSG_32_SUM_CHANGED" -o "$last_commit" = "$MSG_64_SUM_CHANGED" -o "$last_commit" = "$MSG_DATE_ADDED" \) -a \( "$commit_date" = "$(date --rfc-3339=date)" \) ]; do
-			echo -e "\n------------------------------\n"
 			git log -1 --format=fuller | cat
 			git reset --hard HEAD~1
 			
 			last_commit=$(git log -1 --format=format:%s)
 			commit_date=$(git log -1 --date=short --format=format:%cd)
+			echo -e "\n------------------------------\n"
 		done
 		git checkout master
 	done
