@@ -100,6 +100,12 @@ function output_new_commit() {
 # This means that this script will run again after fixing the problem that led to reverting the commits since the date commit is thrown away as well.
 # This function prevents pushing wrong sha256 sums to the git repository.
 function revertCommits() {
+	### Revert update_script branch
+	# Change branch to update_script
+	if [ "$(git branch --show-current)" != "update_script" ]; then
+		git checkout update_script
+	fi
+
 	# Start white Background in console and Write first output
 	$OPT_RESET
 
@@ -108,7 +114,7 @@ function revertCommits() {
 	# Remove the last commit as long as it has the current date and the commit Message matches one of the specified commit messages.
 	while [ \( "$last_commit" = "$MSG_32_SUM_CHANGED" -o "$last_commit" = "$MSG_64_SUM_CHANGED" -o "$last_commit" = "$MSG_DATE_ADDED" \) -a \( "$commit_date" = "$(date --rfc-3339=date)" \) ]; do
 		echo "\n------------------------------\n"
-		git log -1
+		echo $(git log -1 --format=format:fuller)
 		git reset --hard HEAD~1
 		
 		last_commit=$(git log -1 --format=format:%s)
