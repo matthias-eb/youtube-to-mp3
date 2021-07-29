@@ -103,7 +103,7 @@ function output_new_commit() {
 function revertCommits() {
 	# Remove hindering unversioned files 
 	echo "Removing unneeded files and directories..."
-	git clean -n
+	git clean -df
 	### Change first to update_script branch
 	# Change branch to update_script
 	if [ "$(git branch --show-current)" != "update_script" ]; then
