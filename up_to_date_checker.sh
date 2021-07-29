@@ -114,7 +114,7 @@ function revertCommits() {
 	# Remove the last commit as long as it has the current date and the commit Message matches one of the specified commit messages.
 	while [ \( "$last_commit" = "$MSG_32_SUM_CHANGED" -o "$last_commit" = "$MSG_64_SUM_CHANGED" -o "$last_commit" = "$MSG_DATE_ADDED" \) -a \( "$commit_date" = "$(date --rfc-3339=date)" \) ]; do
 		echo "\n------------------------------\n"
-		echo $(git log -1 --format=format:fuller)
+		echo $(git log -1 --format=fuller)
 		git reset --hard HEAD~1
 		
 		last_commit=$(git log -1 --format=format:%s)
