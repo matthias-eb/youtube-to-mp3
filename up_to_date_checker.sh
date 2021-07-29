@@ -25,7 +25,6 @@ OPT_PUSH_AUR="echo ${BOLD}==> Pushing to AUR remote repository...${RS}"
 OPT_PUSH_MASTER="echo -e ${BOLD}==> Pushing to origin master branch...\t${RS}"
 OPT_PUSH_UPDATE_SCRIPT="echo -e ${BOLD}==> Pushing to origin update_script branch...\t${RS}"
 OPT_RESET="echo ${BOLD}${RED}${BG_WHITE}==> Removing commits:${RS}${BLACK}${BG_WHITE}" # Intro for the Resets. Keeps the White background to clarify what belongs to the Reset. Needs to be Reset afterwards
-OPT_RESET_BRANCH="echo Resetting branch ${BOLD}$(git branch --show-current)${RS}${BLACK}${BG_WHITE}"
 OPT_DATE_UPDATE_32="echo ${BOLD}==> 32 Checksum OK, refreshing date...${RS}"
 OPT_DATE_UPDATE_64="echo ${BOLD}==> 64 Checksum OK, refreshing date...${RS}"
 OPT_32_OK="echo ${BOLD}==> 32 Checksum OK${RS}"
@@ -103,7 +102,8 @@ function output_new_commit() {
 function revertCommits() {
 	# Remove hindering unversioned files 
 	echo "Removing unneeded files and directories..."
-	git clean -df
+	git stash
+	git stash drop
 	### Change first to update_script branch
 	# Change branch to update_script
 	if [ "$(git branch --show-current)" != "update_script" ]; then
@@ -113,7 +113,7 @@ function revertCommits() {
 	# Start white Background in console and Write first output
 	$OPT_RESET
 	for i in 1 2; do
-		$OPT_RESET_BRANCH
+		echo "Resetting branch ${BOLD}$(git branch --show-current)${RS}${BLACK}${BG_WHITE}"
 		last_commit=$(git log -1 --format=format:%s)
 		commit_date=$(git log -1 --date=short --format=format:%cd)
 		# Remove the last commit as long as it has the current date and the commit Message matches one of the specified commit messages.
@@ -126,7 +126,6 @@ function revertCommits() {
 			commit_date=$(git log -1 --date=short --format=format:%cd)
 		done
 		git checkout master
-		$OPT_RESET_BRANCH
 	done
 	echo "$RS"
 	md5_changes=false
